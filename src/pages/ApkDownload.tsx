@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Smartphone, Shield, CheckCircle2, Clock, MonitorSmartphone, Loader2, Copy, Plus, Key } from "lucide-react";
+import { Download, Smartphone, Shield, CheckCircle2, Clock, MonitorSmartphone, Loader2, Copy, Plus, Key, FileDown } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,6 +54,23 @@ export default function ApkDownload() {
       return data;
     },
     enabled: !!user,
+  });
+
+  // Fetch latest successful APK build
+  const { data: latestBuild } = useQuery({
+    queryKey: ["latest-apk-build"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("apk_build_configs")
+        .select("id, version, app_name, apk_url, created_at")
+        .eq("build_status", "success")
+        .not("apk_url", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
   });
 
   // Generate new activation code
@@ -119,6 +136,38 @@ export default function ApkDownload() {
           <p className="text-muted-foreground">ClearHuma'yı telefonunuza kurun ve aktivasyon koduyla bağlayın</p>
         </div>
       </AnimatedSection>
+
+      {/* APK Download Section */}
+      {latestBuild?.apk_url && (
+        <AnimatedSection delay={0.05}>
+          <Card className="border-primary/30 bg-primary/5">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="h-14 w-14 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                  <FileDown className="h-7 w-7 text-primary" />
+                </div>
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="text-lg font-bold">APK İndir</h2>
+                  <p className="text-muted-foreground text-sm">
+                    {latestBuild.app_name} v{latestBuild.version} — Android cihazınıza kurun
+                  </p>
+                </div>
+                <Button
+                  size="lg"
+                  className="shrink-0 gap-2"
+                  onClick={() => {
+                    window.open(latestBuild.apk_url!, "_blank");
+                    toast({ title: "İndirme Başladı", description: "APK dosyanız indiriliyor..." });
+                  }}
+                >
+                  <Download className="h-5 w-5" />
+                  APK İndir ({latestBuild.version})
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </AnimatedSection>
+      )}
 
       {/* Activation Codes Section */}
       <AnimatedSection delay={0.1}>
