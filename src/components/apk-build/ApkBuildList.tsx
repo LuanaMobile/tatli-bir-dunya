@@ -2,6 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { BuildLogPanel } from "./BuildLogPanel";
 import { Download, ExternalLink, Loader2, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -84,24 +85,27 @@ export function ApkBuildList() {
                       {new Date(b.created_at).toLocaleString("tr-TR")}
                     </TableCell>
                     <TableCell>
-                      {b.apk_url && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                          <a href={b.apk_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
-                      {b.github_run_id && (
-                        <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
-                          <a
-                            href={`https://github.com/${b.github_run_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </a>
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-0.5">
+                        <BuildLogPanel build={b} />
+                        {b.apk_url && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <a href={b.apk_url} target="_blank" rel="noopener noreferrer">
+                              <Download className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        )}
+                        {b.github_run_id && (
+                          <Button variant="ghost" size="icon" className="h-8 w-8" asChild>
+                            <a
+                              href={`https://github.com/${b.github_run_id}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                            </a>
+                          </Button>
+                        )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
