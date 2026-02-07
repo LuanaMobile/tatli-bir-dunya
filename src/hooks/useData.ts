@@ -37,6 +37,32 @@ export function useDevices() {
   });
 }
 
+export function useDeviceActivations() {
+  return useQuery({
+    queryKey: ["device-activations-admin"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("device_activations")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      // Fetch profiles for user names
+      const userIds = [...new Set((data ?? []).map((d) => d.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("user_id, full_name, email")
+        .in("user_id", userIds);
+
+      return (data ?? []).map((d) => ({
+        ...d,
+        user_name: profiles?.find((p) => p.user_id === d.user_id)?.full_name ||
+          profiles?.find((p) => p.user_id === d.user_id)?.email || "—",
+      }));
+    },
+  });
+}
+
 export function useConsents() {
   return useQuery({
     queryKey: ["consents"],
