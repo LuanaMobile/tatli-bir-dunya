@@ -3,6 +3,7 @@ import { AppSidebar } from "./AppSidebar";
 import { Outlet } from "react-router-dom";
 import { NotificationsDropdown } from "@/components/NotificationsDropdown";
 import { useAuth } from "@/hooks/useAuth";
+import { PermissionRequestDialog } from "@/components/PermissionRequestDialog";
 
 export function AppLayout() {
   const { profile, role } = useAuth();
@@ -41,6 +42,7 @@ export function AppLayout() {
           <main className="flex-1 p-4 md:p-6 overflow-auto">
             <Outlet />
           </main>
+          <PermissionRequestDialog />
         </div>
       </div>
     </SidebarProvider>
