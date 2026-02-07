@@ -20,7 +20,7 @@ export default function Login() {
     setTimeout(() => {
       setLoading(false);
       toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
-      navigate("/");
+      navigate("/dashboard");
     }, 1000);
   };
 
@@ -30,7 +30,7 @@ export default function Login() {
     setTimeout(() => {
       setLoading(false);
       toast({ title: "Kayıt başarılı", description: "Hesabınız oluşturuldu." });
-      navigate("/");
+      navigate("/dashboard");
     }, 1000);
   };
 
