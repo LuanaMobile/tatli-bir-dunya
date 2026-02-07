@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Smartphone, Shield, CheckCircle2, Clock, MonitorSmartphone, Loader2, Copy, Plus, Key, FileDown } from "lucide-react";
+import { Download, Smartphone, Shield, CheckCircle2, Clock, MonitorSmartphone, Loader2, Copy, Plus, Key, FileDown, Trash2 } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -128,6 +128,25 @@ export default function ApkDownload() {
     toast({ title: "Kopyalandı", description: "Aktivasyon kodu panoya kopyalandı." });
   };
 
+  // Delete activation code
+  const deleteCodeMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from("device_activations")
+        .delete()
+        .eq("id", id)
+        .eq("user_id", user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["device-activations"] });
+      toast({ title: "Silindi", description: "Aktivasyon kodu silindi." });
+    },
+    onError: () => {
+      toast({ title: "Hata", description: "Kod silinemedi.", variant: "destructive" });
+    },
+  });
+
   return (
     <div className="space-y-6">
       <AnimatedSection>
@@ -248,14 +267,28 @@ export default function ApkDownload() {
                         )}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0"
-                      onClick={() => copyCode(a.activation_code.toUpperCase())}
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => copyCode(a.activation_code.toUpperCase())}
+                      >
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          if (confirm("Bu aktivasyon kodunu silmek istediğinize emin misiniz?")) {
+                            deleteCodeMutation.mutate(a.id);
+                          }
+                        }}
+                        disabled={deleteCodeMutation.isPending}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 ))}
               </div>
