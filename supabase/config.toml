@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.apk-build-callback]
 verify_jwt = false
+
+[functions.activate-device]
+verify_jwt = false
