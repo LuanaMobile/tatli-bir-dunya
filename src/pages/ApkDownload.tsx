@@ -135,11 +135,24 @@ export default function ApkDownload() {
                   <CheckCircle2 className="h-5 w-5" />
                   <span className="font-medium text-sm">Kurulu</span>
                 </div>
-              ) : deferredPrompt ? (
+              ) : (
                 <Button
                   size="lg"
                   className="shrink-0 gap-2"
-                  onClick={() => installMutation.mutate()}
+                  onClick={() => {
+                    if (deferredPrompt) {
+                      installMutation.mutate();
+                    } else {
+                      // Scroll to install steps
+                      document.getElementById("install-steps")?.scrollIntoView({ behavior: "smooth" });
+                      toast({
+                        title: "Kurulum Rehberi",
+                        description: isIOS
+                          ? "Safari'de Paylaş → Ana Ekrana Ekle adımlarını takip edin."
+                          : "Chrome menüsünden (⋮) → Uygulamayı yükle seçeneğini kullanın.",
+                      });
+                    }
+                  }}
                   disabled={installMutation.isPending}
                 >
                   {installMutation.isPending ? (
@@ -147,12 +160,7 @@ export default function ApkDownload() {
                   ) : (
                     <Download className="h-5 w-5" />
                   )}
-                  Uygulamayı Kur
-                </Button>
-              ) : (
-                <Button size="lg" className="shrink-0 gap-2" variant="outline" disabled>
-                  <Share className="h-5 w-5" />
-                  Aşağıdaki adımları takip edin
+                  Uygulamayı İndir
                 </Button>
               )}
             </div>
@@ -237,7 +245,7 @@ export default function ApkDownload() {
 
       {/* Install steps */}
       <AnimatedSection delay={0.35}>
-        <Card>
+        <Card id="install-steps">
           <CardHeader>
             <CardTitle className="text-base">Kurulum Adımları</CardTitle>
             <CardDescription>
