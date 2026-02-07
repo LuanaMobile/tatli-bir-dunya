@@ -22,6 +22,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
 import ApkDownload from "./pages/ApkDownload";
 import ApkManagement from "./pages/ApkManagement";
+import ApkBuildConfig from "./pages/ApkBuildConfig";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -49,6 +50,7 @@ const App = () => (
               <Route path="/settings" element={<Settings />} />
               <Route path="/apk-download" element={<ApkDownload />} />
               <Route path="/apk-management" element={<ApkManagement />} />
+              <Route path="/apk-build" element={<ApkBuildConfig />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
             </Route>

@@ -1,1 +1,7 @@
 project_id = "fgoqkkberkcqqvwboeye"
+
+[functions.trigger-apk-build]
+verify_jwt = false
+
+[functions.apk-build-callback]
+verify_jwt = false
