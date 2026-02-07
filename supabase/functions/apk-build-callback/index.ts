@@ -15,8 +15,19 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { config_id, status, apk_url, build_log, github_run_id, secret } = body;
 
-    // Simple shared secret verification
-    const callbackSecret = Deno.env.get("APK_BUILD_CALLBACK_SECRET");
+    // Read callback secret from system_settings
+    const serviceClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const { data: secretRow } = await serviceClient
+      .from("system_settings")
+      .select("value")
+      .eq("key", "APK_BUILD_CALLBACK_SECRET")
+      .single();
+
+    const callbackSecret = secretRow?.value;
     if (callbackSecret && secret !== callbackSecret) {
       return new Response(JSON.stringify({ error: "Invalid secret" }), {
         status: 401,
@@ -31,20 +42,15 @@ Deno.serve(async (req) => {
       });
     }
 
-    const supabase = createClient(
-      Deno.env.get("SUPABASE_URL")!,
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-    );
-
     const updateData: Record<string, unknown> = {
-      build_status: status, // "success" | "failed"
+      build_status: status,
     };
 
     if (apk_url) updateData.apk_url = apk_url;
     if (build_log) updateData.build_log = build_log;
     if (github_run_id) updateData.github_run_id = github_run_id;
 
-    const { error } = await supabase
+    const { error } = await serviceClient
       .from("apk_build_configs")
       .update(updateData)
       .eq("id", config_id);

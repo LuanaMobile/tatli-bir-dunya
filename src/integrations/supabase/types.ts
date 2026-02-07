@@ -422,6 +422,36 @@ export type Database = {
           },
         ]
       }
+      system_settings: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_secret: boolean
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_secret?: boolean
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_secret?: boolean
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

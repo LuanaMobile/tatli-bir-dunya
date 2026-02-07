@@ -77,14 +77,26 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Trigger GitHub Actions workflow_dispatch
-    const githubToken = Deno.env.get("GITHUB_TOKEN");
-    const githubRepo = Deno.env.get("GITHUB_REPO"); // format: owner/repo
-    const workflowFile = Deno.env.get("GITHUB_WORKFLOW_FILE") || "build-apk.yml";
+    // Read GitHub settings from system_settings table
+    const { data: settingsRows, error: settingsErr } = await serviceClient
+      .from("system_settings")
+      .select("key, value")
+      .in("key", ["GITHUB_TOKEN", "GITHUB_REPO", "GITHUB_WORKFLOW_FILE"]);
+
+    if (settingsErr) throw settingsErr;
+
+    const settingsMap: Record<string, string> = {};
+    for (const row of settingsRows || []) {
+      settingsMap[row.key] = row.value;
+    }
+
+    const githubToken = settingsMap["GITHUB_TOKEN"];
+    const githubRepo = settingsMap["GITHUB_REPO"];
+    const workflowFile = settingsMap["GITHUB_WORKFLOW_FILE"] || "build-apk.yml";
 
     if (!githubToken || !githubRepo) {
       return new Response(
-        JSON.stringify({ error: "GitHub integration not configured. Set GITHUB_TOKEN and GITHUB_REPO secrets." }),
+        JSON.stringify({ error: "GitHub ayarları yapılandırılmamış. Ayarlar > GitHub / APK sekmesinden girin." }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }

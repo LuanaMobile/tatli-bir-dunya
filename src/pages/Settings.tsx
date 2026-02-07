@@ -5,8 +5,9 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, Database, Bell, FileText } from "lucide-react";
+import { Shield, Database, Bell, FileText, Github } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
+import { GitHubSettingsTab } from "@/components/settings/GitHubSettingsTab";
 
 export default function Settings() {
   return (
@@ -22,10 +23,15 @@ export default function Settings() {
         <Tabs defaultValue="general">
           <TabsList className="flex-wrap">
             <TabsTrigger value="general">Genel</TabsTrigger>
+            <TabsTrigger value="github">GitHub / APK</TabsTrigger>
             <TabsTrigger value="privacy">Gizlilik & Hukuk</TabsTrigger>
             <TabsTrigger value="notifications">Bildirimler</TabsTrigger>
             <TabsTrigger value="data">Veri Yönetimi</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="github" className="mt-4 space-y-4">
+            <GitHubSettingsTab />
+          </TabsContent>
 
           <TabsContent value="general" className="mt-4 space-y-4">
             <Card>
