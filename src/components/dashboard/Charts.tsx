@@ -25,18 +25,19 @@ const monthlyData = [
 ];
 
 const appUsageData = [
-  { name: "Sosyal Medya", value: 35, color: "hsl(187, 80%, 48%)" },
-  { name: "Mesajlaşma", value: 25, color: "hsl(152, 60%, 45%)" },
+  { name: "Sosyal Medya", value: 35, color: "hsl(187, 75%, 38%)" },
+  { name: "Mesajlaşma", value: 25, color: "hsl(152, 60%, 38%)" },
   { name: "Oyun", value: 20, color: "hsl(38, 92%, 50%)" },
   { name: "Eğitim", value: 12, color: "hsl(280, 60%, 55%)" },
-  { name: "Diğer", value: 8, color: "hsl(0, 62%, 45%)" },
+  { name: "Diğer", value: 8, color: "hsl(0, 72%, 51%)" },
 ];
 
 const tooltipStyle = {
-  backgroundColor: "hsl(222, 25%, 9%)",
-  border: "1px solid hsl(222, 20%, 16%)",
+  backgroundColor: "hsl(0, 0%, 100%)",
+  border: "1px solid hsl(220, 15%, 88%)",
   borderRadius: "8px",
-  color: "hsl(210, 20%, 92%)",
+  color: "hsl(220, 25%, 12%)",
+  boxShadow: "0 4px 12px hsl(220 15% 12% / 0.08)",
 };
 
 export function WeeklyScreenChart() {
@@ -49,11 +50,11 @@ export function WeeklyScreenChart() {
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 20%, 16%)" />
-              <XAxis dataKey="gun" stroke="hsl(215, 15%, 55%)" fontSize={12} />
-              <YAxis stroke="hsl(215, 15%, 55%)" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 90%)" />
+              <XAxis dataKey="gun" stroke="hsl(220, 10%, 46%)" fontSize={12} />
+              <YAxis stroke="hsl(220, 10%, 46%)" fontSize={12} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Bar dataKey="sure" fill="hsl(187, 80%, 48%)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="sure" fill="hsl(187, 75%, 38%)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -72,11 +73,11 @@ export function UserTrendChart() {
         <CardContent>
           <ResponsiveContainer width="100%" height={260}>
             <LineChart data={weeklyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 20%, 16%)" />
-              <XAxis dataKey="gun" stroke="hsl(215, 15%, 55%)" fontSize={12} />
-              <YAxis stroke="hsl(215, 15%, 55%)" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 90%)" />
+              <XAxis dataKey="gun" stroke="hsl(220, 10%, 46%)" fontSize={12} />
+              <YAxis stroke="hsl(220, 10%, 46%)" fontSize={12} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Line type="monotone" dataKey="kullanici" stroke="hsl(152, 60%, 45%)" strokeWidth={2} dot={{ fill: "hsl(152, 60%, 45%)" }} />
+              <Line type="monotone" dataKey="kullanici" stroke="hsl(152, 60%, 38%)" strokeWidth={2} dot={{ fill: "hsl(152, 60%, 38%)" }} />
             </LineChart>
           </ResponsiveContainer>
         </CardContent>
@@ -97,15 +98,15 @@ export function RevenueChart() {
             <AreaChart data={monthlyData}>
               <defs>
                 <linearGradient id="gelirGradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(187, 80%, 48%)" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="hsl(187, 80%, 48%)" stopOpacity={0} />
+                  <stop offset="5%" stopColor="hsl(187, 75%, 38%)" stopOpacity={0.2} />
+                  <stop offset="95%" stopColor="hsl(187, 75%, 38%)" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(222, 20%, 16%)" />
-              <XAxis dataKey="ay" stroke="hsl(215, 15%, 55%)" fontSize={12} />
-              <YAxis stroke="hsl(215, 15%, 55%)" fontSize={12} />
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(220, 15%, 90%)" />
+              <XAxis dataKey="ay" stroke="hsl(220, 10%, 46%)" fontSize={12} />
+              <YAxis stroke="hsl(220, 10%, 46%)" fontSize={12} />
               <Tooltip contentStyle={tooltipStyle} />
-              <Area type="monotone" dataKey="gelir" stroke="hsl(187, 80%, 48%)" fill="url(#gelirGradient)" strokeWidth={2} />
+              <Area type="monotone" dataKey="gelir" stroke="hsl(187, 75%, 38%)" fill="url(#gelirGradient)" strokeWidth={2} />
             </AreaChart>
           </ResponsiveContainer>
         </CardContent>

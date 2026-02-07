@@ -11,7 +11,7 @@ export function AppLayout() {
     : "??";
   const roleName = role === "super_admin" ? "Super Admin" : role === "guardian" ? "Guardian" : "Kullanıcı";
 
-  const themeClass = role === "super_admin" || role === "guardian" ? "dark" : "dark theme-user";
+  const themeClass = role === "super_admin" || role === "guardian" ? "" : "theme-user";
 
   return (
     <SidebarProvider>

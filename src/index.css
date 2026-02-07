@@ -4,130 +4,92 @@
 
 @layer base {
   :root {
-    --background: 220 20% 97%;
-    --foreground: 220 25% 10%;
+    /* Admin Light Corporate Theme — Teal/Cyan */
+    --background: 210 20% 96%;
+    --foreground: 220 25% 12%;
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 220 25% 12%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
-    --primary: 187 80% 42%;
-    --primary-foreground: 220 25% 5%;
-    --secondary: 220 15% 92%;
-    --secondary-foreground: 220 25% 10%;
-    --muted: 220 15% 92%;
-    --muted-foreground: 220 10% 50%;
-    --accent: 187 80% 42%;
-    --accent-foreground: 220 25% 5%;
+    --popover-foreground: 220 25% 12%;
+    --primary: 187 75% 38%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 18% 90%;
+    --secondary-foreground: 220 25% 12%;
+    --muted: 210 18% 93%;
+    --muted-foreground: 220 10% 46%;
+    --accent: 187 50% 92%;
+    --accent-foreground: 187 75% 28%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     --border: 220 15% 88%;
     --input: 220 15% 88%;
-    --ring: 187 80% 42%;
-    --radius: 0.5rem;
-    --sidebar-background: 220 25% 8%;
-    --sidebar-foreground: 220 10% 80%;
-    --sidebar-primary: 187 80% 42%;
-    --sidebar-primary-foreground: 220 25% 5%;
-    --sidebar-accent: 220 20% 14%;
-    --sidebar-accent-foreground: 220 10% 90%;
-    --sidebar-border: 220 20% 16%;
-    --sidebar-ring: 187 80% 42%;
+    --ring: 187 75% 38%;
+    --radius: 0.625rem;
 
-    --success: 152 60% 42%;
+    --sidebar-background: 200 25% 16%;
+    --sidebar-foreground: 210 15% 85%;
+    --sidebar-primary: 187 75% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 200 20% 22%;
+    --sidebar-accent-foreground: 210 15% 92%;
+    --sidebar-border: 200 20% 22%;
+    --sidebar-ring: 187 75% 48%;
+
+    --success: 152 60% 38%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --info: 210 80% 55%;
+    --info: 210 80% 50%;
     --info-foreground: 0 0% 100%;
-    --chart-1: 187 80% 42%;
-    --chart-2: 152 60% 42%;
+    --chart-1: 187 75% 38%;
+    --chart-2: 152 60% 38%;
     --chart-3: 38 92% 50%;
     --chart-4: 280 60% 55%;
     --chart-5: 0 72% 51%;
   }
 
-  .dark {
-    --background: 222 30% 6%;
-    --foreground: 210 20% 92%;
-    --card: 222 25% 9%;
-    --card-foreground: 210 20% 92%;
-    --popover: 222 25% 9%;
-    --popover-foreground: 210 20% 92%;
-    --primary: 187 80% 48%;
-    --primary-foreground: 222 30% 6%;
-    --secondary: 222 20% 14%;
-    --secondary-foreground: 210 20% 92%;
-    --muted: 222 20% 14%;
-    --muted-foreground: 215 15% 55%;
-    --accent: 222 20% 14%;
-    --accent-foreground: 210 20% 92%;
-    --destructive: 0 62% 45%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 222 20% 16%;
-    --input: 222 20% 16%;
-    --ring: 187 80% 48%;
-    --sidebar-background: 222 35% 5%;
-    --sidebar-foreground: 215 15% 70%;
-    --sidebar-primary: 187 80% 48%;
-    --sidebar-primary-foreground: 222 30% 6%;
-    --sidebar-accent: 222 25% 12%;
-    --sidebar-accent-foreground: 210 20% 92%;
-    --sidebar-border: 222 25% 12%;
-    --sidebar-ring: 187 80% 48%;
-
-    --success: 152 60% 45%;
-    --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;
-    --warning-foreground: 0 0% 100%;
-    --info: 210 80% 55%;
-    --info-foreground: 0 0% 100%;
-    --chart-1: 187 80% 48%;
-    --chart-2: 152 60% 45%;
-    --chart-3: 38 92% 50%;
-    --chart-4: 280 60% 55%;
-    --chart-5: 0 62% 45%;
-  }
-
-  /* User role theme — warm indigo/purple palette */
+  /* User Light Corporate Theme — Purple/Indigo */
   .theme-user {
-    --background: 240 25% 8%;
-    --foreground: 230 20% 92%;
-    --card: 240 22% 11%;
-    --card-foreground: 230 20% 92%;
-    --popover: 240 22% 11%;
-    --popover-foreground: 230 20% 92%;
-    --primary: 262 70% 58%;
+    --background: 240 15% 96%;
+    --foreground: 240 20% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 20% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 20% 12%;
+    --primary: 262 65% 52%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 18% 16%;
-    --secondary-foreground: 230 20% 92%;
-    --muted: 240 18% 16%;
-    --muted-foreground: 235 12% 55%;
-    --accent: 240 18% 16%;
-    --accent-foreground: 230 20% 92%;
-    --destructive: 0 62% 45%;
+    --secondary: 240 14% 90%;
+    --secondary-foreground: 240 20% 12%;
+    --muted: 240 14% 93%;
+    --muted-foreground: 240 8% 46%;
+    --accent: 262 40% 92%;
+    --accent-foreground: 262 65% 40%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 18% 18%;
-    --input: 240 18% 18%;
-    --ring: 262 70% 58%;
-    --sidebar-background: 240 30% 6%;
-    --sidebar-foreground: 235 12% 70%;
-    --sidebar-primary: 262 70% 58%;
+    --border: 240 12% 88%;
+    --input: 240 12% 88%;
+    --ring: 262 65% 52%;
+
+    --sidebar-background: 250 25% 18%;
+    --sidebar-foreground: 240 12% 85%;
+    --sidebar-primary: 262 65% 58%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 22% 14%;
-    --sidebar-accent-foreground: 230 20% 92%;
-    --sidebar-border: 240 22% 14%;
-    --sidebar-ring: 262 70% 58%;
-    --success: 152 60% 45%;
+    --sidebar-accent: 250 20% 24%;
+    --sidebar-accent-foreground: 240 12% 92%;
+    --sidebar-border: 250 20% 24%;
+    --sidebar-ring: 262 65% 58%;
+
+    --success: 152 60% 38%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
-    --info: 210 80% 55%;
+    --info: 210 80% 50%;
     --info-foreground: 0 0% 100%;
-    --chart-1: 262 70% 58%;
-    --chart-2: 290 55% 50%;
-    --chart-3: 330 65% 55%;
-    --chart-4: 210 80% 55%;
-    --chart-5: 0 62% 45%;
+    --chart-1: 262 65% 52%;
+    --chart-2: 290 50% 48%;
+    --chart-3: 330 60% 52%;
+    --chart-4: 210 80% 50%;
+    --chart-5: 0 72% 51%;
   }
 }
 
@@ -142,7 +104,7 @@
 
 @layer utilities {
   .glow-primary {
-    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.3);
+    box-shadow: 0 0 20px -5px hsl(var(--primary) / 0.25);
   }
   .text-gradient {
     background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--chart-2)));

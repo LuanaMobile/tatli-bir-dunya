@@ -62,8 +62,8 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background dark p-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(187_80%_48%/0.08),transparent_60%)]" />
+    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,hsl(187_75%_38%/0.1),transparent_60%)]" />
       <div className="w-full max-w-md relative z-10">
         <div className="flex items-center justify-center gap-3 mb-8">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary glow-primary">
