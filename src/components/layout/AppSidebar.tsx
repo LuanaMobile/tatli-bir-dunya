@@ -14,6 +14,7 @@ import {
   Bell,
   FileText,
   Download,
+  Hammer,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -42,6 +43,7 @@ const adminManagementNav = [
   { title: "Abonelikler", url: "/subscriptions", icon: CreditCard },
   { title: "Faturalar", url: "/invoices", icon: Receipt },
   { title: "APK Yönetimi", url: "/apk-management", icon: Download },
+  { title: "APK Build", url: "/apk-build", icon: Hammer },
   { title: "Raporlar", url: "/reports", icon: BarChart3 },
   { title: "Ayarlar", url: "/settings", icon: Settings },
 ];

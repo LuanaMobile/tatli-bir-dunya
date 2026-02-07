@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      apk_build_configs: {
+        Row: {
+          apk_url: string | null
+          app_name: string
+          build_log: string | null
+          build_status: string
+          created_at: string
+          created_by: string
+          extra_config: Json | null
+          github_run_id: string | null
+          icon_url: string | null
+          id: string
+          permissions: Json
+          server_url: string
+          splash_url: string | null
+          tracking_id: string | null
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          apk_url?: string | null
+          app_name?: string
+          build_log?: string | null
+          build_status?: string
+          created_at?: string
+          created_by: string
+          extra_config?: Json | null
+          github_run_id?: string | null
+          icon_url?: string | null
+          id?: string
+          permissions?: Json
+          server_url: string
+          splash_url?: string | null
+          tracking_id?: string | null
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          apk_url?: string | null
+          app_name?: string
+          build_log?: string | null
+          build_status?: string
+          created_at?: string
+          created_by?: string
+          extra_config?: Json | null
+          github_run_id?: string | null
+          icon_url?: string | null
+          id?: string
+          permissions?: Json
+          server_url?: string
+          splash_url?: string | null
+          tracking_id?: string | null
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       apk_downloads: {
         Row: {
           apk_version_id: string | null
