@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      apk_downloads: {
+        Row: {
+          apk_version_id: string | null
+          created_at: string
+          device_info: Json | null
+          download_token: string
+          downloaded_at: string | null
+          id: string
+          installed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          apk_version_id?: string | null
+          created_at?: string
+          device_info?: Json | null
+          download_token?: string
+          downloaded_at?: string | null
+          id?: string
+          installed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          apk_version_id?: string | null
+          created_at?: string
+          device_info?: Json | null
+          download_token?: string
+          downloaded_at?: string | null
+          id?: string
+          installed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "apk_downloads_apk_version_id_fkey"
+            columns: ["apk_version_id"]
+            isOneToOne: false
+            referencedRelation: "apk_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      apk_versions: {
+        Row: {
+          created_at: string
+          file_size: string | null
+          file_url: string | null
+          id: string
+          is_active: boolean | null
+          min_android: string | null
+          release_notes: string | null
+          updated_at: string
+          version: string
+        }
+        Insert: {
+          created_at?: string
+          file_size?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          min_android?: string | null
+          release_notes?: string | null
+          updated_at?: string
+          version: string
+        }
+        Update: {
+          created_at?: string
+          file_size?: string | null
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          min_android?: string | null
+          release_notes?: string | null
+          updated_at?: string
+          version?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string

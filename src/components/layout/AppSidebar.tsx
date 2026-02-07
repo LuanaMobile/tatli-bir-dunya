@@ -41,6 +41,7 @@ const adminMainNav = [
 const adminManagementNav = [
   { title: "Abonelikler", url: "/subscriptions", icon: CreditCard },
   { title: "Faturalar", url: "/invoices", icon: Receipt },
+  { title: "APK Yönetimi", url: "/apk-management", icon: Download },
   { title: "Raporlar", url: "/reports", icon: BarChart3 },
   { title: "Ayarlar", url: "/settings", icon: Settings },
 ];
