@@ -266,11 +266,11 @@ export default function ApkDownload() {
               ) : (
                 <>
                   {[
-                    "Yukarıdaki \"Uygulamayı Kur\" butonuna tıklayın (görünüyorsa).",
-                    "Buton görünmüyorsa: Chrome menüsünden (⋮) \"Uygulamayı yükle\" seçin.",
-                    "Açılan pencerede \"Yükle\" butonuna dokunun.",
-                    "Uygulama ana ekranınıza eklenecek — gerçek bir uygulama gibi açılır.",
-                    "Giriş yapın — tüm verileriniz kişisel ve güvenlidir.",
+                    "Chrome tarayıcısında bu sayfayı açın.",
+                    "Sağ üstteki üç nokta menüsüne (⋮) dokunun.",
+                    "\"Uygulamayı yükle\" veya \"Ana ekrana ekle\" seçeneğine dokunun.",
+                    "Açılan pencerede \"Yükle\" butonuna dokunun — uygulama ana ekranınıza eklenecek.",
+                    "Ana ekrandan ClearHuma ikonuna dokunarak açın ve giriş yapın.",
                   ].map((step, i) => (
                     <li key={i} className="flex items-start gap-3">
                       <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
