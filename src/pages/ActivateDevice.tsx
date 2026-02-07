@@ -1,10 +1,16 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Loader2, ShieldCheck, CheckCircle2, Bell, MapPin, Camera, HardDrive, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
+
+const isNativeApp = () => {
+  return window.matchMedia("(display-mode: standalone)").matches ||
+    (window as any).Capacitor !== undefined ||
+    document.referrer.includes("android-app://");
+};
 
 type PermissionStatus = "prompt" | "granted" | "denied" | "unsupported" | "loading";
 
@@ -16,6 +22,14 @@ export default function ActivateDevice() {
   const [requesting, setRequesting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  // If already activated, skip directly to dashboard
+  useEffect(() => {
+    const alreadyActivated = localStorage.getItem("clearhuma_device_activated");
+    if (alreadyActivated === "true") {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [navigate]);
 
   const [statuses, setStatuses] = useState<Record<string, PermissionStatus>>({
     notifications: "loading",

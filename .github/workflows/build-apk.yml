@@ -74,8 +74,15 @@ jobs:
             "appName": "${{ inputs.app_name }}",
             "webDir": "www",
             "server": {
-              "url": "${{ inputs.server_url }}/activate",
-              "cleartext": true
+              "url": "${{ inputs.server_url }}/activate?forceHideBadge=true",
+              "cleartext": true,
+              "androidScheme": "https",
+              "allowNavigation": ["*"]
+            },
+            "android": {
+              "allowMixedContent": true,
+              "captureInput": true,
+              "webContentsDebuggingEnabled": false
             }
           }
           CAPEOF
@@ -98,7 +105,23 @@ jobs:
             <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" \/>\
             <uses-permission android:name="android.permission.POST_NOTIFICATIONS" \/>\
             <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" \/>' "$MANIFEST"
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" \/>\
+            <uses-permission android:name="android.permission.RECORD_AUDIO" \/>\
+            <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" \/>\
+            <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" \/>' "$MANIFEST"
+          
+          # Force WebView to handle ALL URLs internally - never open external browser
+          ACTIVITY_FILE=$(find android/app/src/main -name "MainActivity.java" -o -name "MainActivity.kt" | head -1)
+          if [[ "$ACTIVITY_FILE" == *".java" ]]; then
+            sed -i '/import com.getcapacitor.BridgeActivity;/a import android.webkit.WebView;\nimport android.os.Bundle;\nimport android.view.View;' "$ACTIVITY_FILE"
+            sed -i '/public class MainActivity/a \\n    @Override\n    protected void onCreate(Bundle savedInstanceState) {\n        super.onCreate(savedInstanceState);\n        // Hide system UI for immersive native feel\n        getWindow().getDecorView().setSystemUiVisibility(\n            View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN\n        );\n    }' "$ACTIVITY_FILE"
+          fi
+          
+          # Set fullscreen theme in styles.xml
+          STYLES="android/app/src/main/res/values/styles.xml"
+          if [ -f "$STYLES" ]; then
+            sed -i 's|<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">|<style name="AppTheme.NoActionBar" parent="Theme.AppCompat.NoActionBar">\n        <item name="android:windowFullscreen">false</item>\n        <item name="android:statusBarColor">@android:color/black</item>\n        <item name="android:navigationBarColor">@android:color/black</item>|' "$STYLES"
+          fi
 
       - name: Download custom icon
         if: ${{ inputs.icon_url != '' }}
