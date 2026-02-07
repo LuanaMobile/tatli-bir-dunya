@@ -50,7 +50,7 @@ const userMainNav = [
   { title: "Ana Sayfa", url: "/dashboard", icon: Home },
   { title: "Cihazlarım", url: "/devices", icon: Smartphone },
   { title: "İzinlerim", url: "/consents", icon: ShieldCheck },
-  { title: "APK İndir", url: "/apk-download", icon: Download },
+  { title: "Uygulamayı İndir", url: "/apk-download", icon: Download },
 ];
 
 const userManagementNav = [
