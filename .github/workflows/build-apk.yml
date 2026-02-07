@@ -86,6 +86,20 @@ jobs:
             cp icon.png "android/app/src/main/res/mipmap-${dir}/ic_launcher_round.png"
           done
 
+      - name: Fix Kotlin stdlib conflicts
+        run: |
+          cd /tmp/apk-build/android
+          cat >> app/build.gradle << 'EOF'
+
+          configurations.all {
+              resolutionStrategy {
+                  force 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+                  force 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.24'
+                  force 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.24'
+              }
+          }
+          EOF
+
       - name: Build Debug APK
         run: |
           cd /tmp/apk-build/android
