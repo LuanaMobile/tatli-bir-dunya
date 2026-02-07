@@ -10,6 +10,9 @@ import {
   Eye,
   LogOut,
   Receipt,
+  Home,
+  Bell,
+  FileText,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -26,7 +29,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
-const mainNav = [
+const adminMainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Kullanıcılar", url: "/users", icon: Users },
   { title: "Cihazlar", url: "/devices", icon: Smartphone },
@@ -34,16 +37,32 @@ const mainNav = [
   { title: "Audit Log", url: "/audit-logs", icon: ScrollText },
 ];
 
-const managementNav = [
+const adminManagementNav = [
   { title: "Abonelikler", url: "/subscriptions", icon: CreditCard },
   { title: "Faturalar", url: "/invoices", icon: Receipt },
   { title: "Raporlar", url: "/reports", icon: BarChart3 },
   { title: "Ayarlar", url: "/settings", icon: Settings },
 ];
 
+const userMainNav = [
+  { title: "Ana Sayfa", url: "/dashboard", icon: Home },
+  { title: "Cihazlarım", url: "/devices", icon: Smartphone },
+  { title: "İzinlerim", url: "/consents", icon: ShieldCheck },
+];
+
+const userManagementNav = [
+  { title: "Aboneliğim", url: "/subscriptions", icon: CreditCard },
+  { title: "Faturalarım", url: "/invoices", icon: Receipt },
+  { title: "Ayarlar", url: "/settings", icon: Settings },
+];
+
 export function AppSidebar() {
   const navigate = useNavigate();
-  const { signOut } = useAuth();
+  const { signOut, role } = useAuth();
+  const isAdmin = role === "super_admin" || role === "guardian";
+
+  const mainNav = isAdmin ? adminMainNav : userMainNav;
+  const managementNav = isAdmin ? adminManagementNav : userManagementNav;
 
   const handleLogout = async () => {
     await signOut();
@@ -63,7 +82,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Ana Menü</SidebarGroupLabel>
+          <SidebarGroupLabel>{isAdmin ? "Ana Menü" : "Menü"}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainNav.map((item) => (
@@ -81,7 +100,7 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Yönetim</SidebarGroupLabel>
+          <SidebarGroupLabel>{isAdmin ? "Yönetim" : "Hesabım"}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {managementNav.map((item) => (
