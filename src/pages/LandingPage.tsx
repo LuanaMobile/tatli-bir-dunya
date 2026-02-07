@@ -165,6 +165,10 @@ export default function LandingPage() {
             <Button variant="ghost" size="sm" onClick={() => navigate("/login")}>
               Giriş Yap
             </Button>
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => navigate("/login?redirect=/apk-download")}>
+              <Smartphone className="h-3.5 w-3.5" />
+              Uygulamayı İndir
+            </Button>
             <Button size="sm" className="group" onClick={() => navigate("/login")}>
               Ücretsiz Başla
               <ArrowRight className="h-4 w-4 ml-1 transition-transform group-hover:translate-x-1" />
@@ -240,9 +244,9 @@ export default function LandingPage() {
                     <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </span>
                 </Button>
-                <Button size="lg" variant="outline" className="h-13 px-8 text-base border-border/50 backdrop-blur-sm" onClick={() => navigate("/login")}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Demo İncele
+                <Button size="lg" variant="outline" className="h-13 px-8 text-base border-border/50 backdrop-blur-sm gap-2" onClick={() => navigate("/login?redirect=/apk-download")}>
+                  <Smartphone className="h-4 w-4" />
+                  Uygulamayı İndir
                 </Button>
               </motion.div>
 
