@@ -3,6 +3,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ShieldCheck, ShieldX, Eye, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/AnimatedSection";
 
 const mockConsents = [
   { id: 1, user: "Ahmet Yılmaz", module: "SMS Okuma", status: "granted", grantedAt: "2025-01-15 14:32", ip: "192.168.1.45", device: "Samsung Galaxy S23" },
@@ -27,92 +29,104 @@ export default function Consents() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">İzin Yönetimi</h1>
-        <p className="text-muted-foreground">Açık rıza kayıtlarını inceleyin</p>
-      </div>
+      <AnimatedSection>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">İzin Yönetimi</h1>
+          <p className="text-muted-foreground">Açık rıza kayıtlarını inceleyin</p>
+        </div>
+      </AnimatedSection>
 
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <Card>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
-              <ShieldCheck className="h-5 w-5 text-success" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{granted}</p>
-              <p className="text-sm text-muted-foreground">Aktif İzin</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
-              <ShieldX className="h-5 w-5 text-destructive" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{revoked}</p>
-              <p className="text-sm text-muted-foreground">İptal Edilen</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5 flex items-center gap-3">
-            <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
-              <Clock className="h-5 w-5 text-warning" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{expired}</p>
-              <p className="text-sm text-muted-foreground">Süresi Dolan</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <StaggerContainer className="grid gap-4 grid-cols-1 sm:grid-cols-3">
+        <StaggerItem>
+          <Card>
+            <CardContent className="p-5 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-success/10 flex items-center justify-center">
+                <ShieldCheck className="h-5 w-5 text-success" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{granted}</p>
+                <p className="text-sm text-muted-foreground">Aktif İzin</p>
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+        <StaggerItem>
+          <Card>
+            <CardContent className="p-5 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+                <ShieldX className="h-5 w-5 text-destructive" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{revoked}</p>
+                <p className="text-sm text-muted-foreground">İptal Edilen</p>
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+        <StaggerItem>
+          <Card>
+            <CardContent className="p-5 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-warning" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{expired}</p>
+                <p className="text-sm text-muted-foreground">Süresi Dolan</p>
+              </div>
+            </CardContent>
+          </Card>
+        </StaggerItem>
+      </StaggerContainer>
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base">İzin Kayıtları</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kullanıcı</TableHead>
-                <TableHead>Modül</TableHead>
-                <TableHead>Cihaz</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead>IP Adresi</TableHead>
-                <TableHead>Tarih</TableHead>
-                <TableHead className="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockConsents.map((consent) => {
-                const config = statusConfig[consent.status];
-                return (
-                  <TableRow key={consent.id}>
-                    <TableCell className="font-medium text-sm">{consent.user}</TableCell>
-                    <TableCell className="text-sm">{consent.module}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{consent.device}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`text-xs ${config.className}`}>
-                        <config.icon className="h-3 w-3 mr-1" />
-                        {config.label}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground font-mono">{consent.ip}</TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{consent.grantedAt}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+      <AnimatedSection delay={0.2}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">İzin Kayıtları</CardTitle>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ResponsiveTable>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Kullanıcı</TableHead>
+                    <TableHead>Modül</TableHead>
+                    <TableHead className="hidden md:table-cell">Cihaz</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead className="hidden lg:table-cell">IP Adresi</TableHead>
+                    <TableHead className="hidden sm:table-cell">Tarih</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {mockConsents.map((consent) => {
+                    const config = statusConfig[consent.status];
+                    return (
+                      <TableRow key={consent.id}>
+                        <TableCell className="font-medium text-sm">{consent.user}</TableCell>
+                        <TableCell className="text-sm">{consent.module}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground hidden md:table-cell">{consent.device}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`text-xs ${config.className}`}>
+                            <config.icon className="h-3 w-3 mr-1" />
+                            {config.label}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground font-mono hidden lg:table-cell">{consent.ip}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{consent.grantedAt}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </ResponsiveTable>
+          </CardContent>
+        </Card>
+      </AnimatedSection>
     </div>
   );
 }

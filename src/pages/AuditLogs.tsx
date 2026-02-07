@@ -1,10 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Search, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { AnimatedSection } from "@/components/AnimatedSection";
 
 const mockLogs = [
   { id: 1, actor: "admin@clearhuma.com", role: "Super Admin", action: "Kullanıcı oluşturuldu", target: "Ahmet Yılmaz", ip: "192.168.1.1", timestamp: "2025-01-28 14:32:05", category: "user" },
@@ -44,59 +46,65 @@ export default function AuditLogs() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Audit Log</h1>
-        <p className="text-muted-foreground">Tüm sistem işlemlerinin denetim kaydı</p>
-      </div>
+      <AnimatedSection>
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Audit Log</h1>
+          <p className="text-muted-foreground">Tüm sistem işlemlerinin denetim kaydı</p>
+        </div>
+      </AnimatedSection>
 
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="İşlem veya kullanıcı ara..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+      <AnimatedSection delay={0.1}>
+        <Card>
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
+              <div className="relative flex-1 max-w-sm w-full">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="İşlem veya kullanıcı ara..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+              </div>
+              <Button variant="outline" size="sm">
+                <Filter className="h-4 w-4 mr-2" />
+                Filtrele
+              </Button>
             </div>
-            <Button variant="outline" size="sm">
-              <Filter className="h-4 w-4 mr-2" />
-              Filtrele
-            </Button>
+          </CardHeader>
+          <div className="p-0">
+            <ResponsiveTable>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="hidden lg:table-cell">Tarih</TableHead>
+                    <TableHead>İşlem Yapan</TableHead>
+                    <TableHead className="hidden sm:table-cell">Rol</TableHead>
+                    <TableHead>İşlem</TableHead>
+                    <TableHead className="hidden md:table-cell">Hedef</TableHead>
+                    <TableHead>Kategori</TableHead>
+                    <TableHead className="hidden lg:table-cell">IP</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="text-xs text-muted-foreground font-mono whitespace-nowrap hidden lg:table-cell">{log.timestamp}</TableCell>
+                      <TableCell className="text-sm">{log.actor}</TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge variant="outline" className="text-xs">{log.role}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm font-medium">{log.action}</TableCell>
+                      <TableCell className="text-sm text-muted-foreground hidden md:table-cell">{log.target}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className={`text-xs ${categoryColors[log.category] || ""}`}>
+                          {categoryLabels[log.category] || log.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground font-mono hidden lg:table-cell">{log.ip}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </ResponsiveTable>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Tarih</TableHead>
-                <TableHead>İşlem Yapan</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead>İşlem</TableHead>
-                <TableHead>Hedef</TableHead>
-                <TableHead>Kategori</TableHead>
-                <TableHead>IP</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((log) => (
-                <TableRow key={log.id}>
-                  <TableCell className="text-xs text-muted-foreground font-mono whitespace-nowrap">{log.timestamp}</TableCell>
-                  <TableCell className="text-sm">{log.actor}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">{log.role}</Badge>
-                  </TableCell>
-                  <TableCell className="text-sm font-medium">{log.action}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{log.target}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className={`text-xs ${categoryColors[log.category] || ""}`}>
-                      {categoryLabels[log.category] || log.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-xs text-muted-foreground font-mono">{log.ip}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+        </Card>
+      </AnimatedSection>
     </div>
   );
 }
