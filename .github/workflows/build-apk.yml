@@ -46,8 +46,10 @@ jobs:
           node-version: '20'
 
       - name: Install Capacitor & Build
+        working-directory: /tmp
         run: |
-          mkdir -p /tmp/apk-build && cd /tmp/apk-build
+          mkdir -p apk-build
+          cd apk-build
           npm init -y
           npm install @capacitor/core @capacitor/cli @capacitor/android
           npx cap init "${{ inputs.app_name }}" "com.clearhuma.app" --web-dir=www
