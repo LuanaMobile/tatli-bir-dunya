@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Download, Smartphone, Shield, CheckCircle2, Clock, Share, MonitorSmartphone, Loader2 } from "lucide-react";
+import { Download, Smartphone, Shield, CheckCircle2, Clock, MonitorSmartphone, Loader2, Copy, Plus, Key } from "lucide-react";
 import { AnimatedSection } from "@/components/AnimatedSection";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -23,38 +23,31 @@ export default function ApkDownload() {
   const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // Detect iOS
     const ua = navigator.userAgent;
     setIsIOS(/iPad|iPhone|iPod/.test(ua));
-
-    // Check if already installed
     if (window.matchMedia("(display-mode: standalone)").matches) {
       setIsInstalled(true);
     }
-
-    // Capture install prompt
     const handler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
     };
     window.addEventListener("beforeinstallprompt", handler);
-
     const installedHandler = () => setIsInstalled(true);
     window.addEventListener("appinstalled", installedHandler);
-
     return () => {
       window.removeEventListener("beforeinstallprompt", handler);
       window.removeEventListener("appinstalled", installedHandler);
     };
   }, []);
 
-  // Track download
-  const { data: myDownloads } = useQuery({
-    queryKey: ["apk-downloads", user?.id],
+  // Fetch user's activation codes
+  const { data: activations, isLoading: loadingCodes } = useQuery({
+    queryKey: ["device-activations", user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("apk_downloads")
-        .select("*, apk_versions(*)")
+        .from("device_activations")
+        .select("*")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
@@ -63,9 +56,27 @@ export default function ApkDownload() {
     enabled: !!user,
   });
 
+  // Generate new activation code
+  const generateCodeMutation = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("activate-device", {
+        body: { action: "generate" },
+      });
+      if (error || !data?.success) throw new Error(data?.error || "Kod oluşturulamadı");
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["device-activations"] });
+      toast({ title: "Yeni Kod Oluşturuldu", description: "Aktivasyon kodunuz hazır." });
+    },
+    onError: (err: Error) => {
+      toast({ title: "Hata", description: err.message, variant: "destructive" });
+    },
+  });
+
+  // PWA install
   const installMutation = useMutation({
     mutationFn: async () => {
-      // Record install attempt
       if (user) {
         const { data: latestApk } = await supabase
           .from("apk_versions")
@@ -74,15 +85,12 @@ export default function ApkDownload() {
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle();
-
         await supabase.from("apk_downloads").insert({
           user_id: user.id,
           apk_version_id: latestApk?.id ?? null,
           downloaded_at: new Date().toISOString(),
         });
       }
-
-      // Trigger PWA install
       if (deferredPrompt) {
         await deferredPrompt.prompt();
         const { outcome } = await deferredPrompt.userChoice;
@@ -98,20 +106,117 @@ export default function ApkDownload() {
     },
   });
 
-  const lastDownload = myDownloads?.[0];
-  const downloadToken = lastDownload?.download_token;
+  const copyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    toast({ title: "Kopyalandı", description: "Aktivasyon kodu panoya kopyalandı." });
+  };
 
   return (
     <div className="space-y-6">
       <AnimatedSection>
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Uygulamayı İndir</h1>
-          <p className="text-muted-foreground">ClearHuma'yı telefonunuza kurun</p>
+          <p className="text-muted-foreground">ClearHuma'yı telefonunuza kurun ve aktivasyon koduyla bağlayın</p>
         </div>
       </AnimatedSection>
 
-      {/* Main install card */}
+      {/* Activation Codes Section */}
       <AnimatedSection delay={0.1}>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+            <div>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Key className="h-4 w-4 text-primary" />
+                Aktivasyon Kodlarım
+              </CardTitle>
+              <CardDescription>
+                APK'yı açtığınızda bu kodu girerek cihazınızı hesabınıza bağlayın
+              </CardDescription>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              className="gap-1.5"
+              onClick={() => generateCodeMutation.mutate()}
+              disabled={generateCodeMutation.isPending}
+            >
+              {generateCodeMutation.isPending ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <Plus className="h-3.5 w-3.5" />
+              )}
+              Yeni Kod
+            </Button>
+          </CardHeader>
+          <CardContent>
+            {loadingCodes ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : !activations?.length ? (
+              <div className="text-center py-6 space-y-2">
+                <p className="text-sm text-muted-foreground">Henüz aktivasyon kodunuz yok.</p>
+                <Button
+                  size="sm"
+                  onClick={() => generateCodeMutation.mutate()}
+                  disabled={generateCodeMutation.isPending}
+                  className="gap-1.5"
+                >
+                  <Plus className="h-3.5 w-3.5" />
+                  Kod Oluştur
+                </Button>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {activations.map((a) => (
+                  <div
+                    key={a.id}
+                    className="flex items-center gap-3 p-3 rounded-lg bg-muted/50"
+                  >
+                    <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <Smartphone className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-lg font-mono font-bold tracking-widest">
+                        {a.activation_code.toUpperCase()}
+                      </p>
+                      <div className="flex items-center gap-2">
+                        {a.is_activated ? (
+                          <Badge variant="default" className="text-xs bg-success/10 text-success border-success/20">
+                            <CheckCircle2 className="h-3 w-3 mr-1" />
+                            Aktif
+                          </Badge>
+                        ) : (
+                          <Badge variant="outline" className="text-xs">
+                            <Clock className="h-3 w-3 mr-1" />
+                            Bekliyor
+                          </Badge>
+                        )}
+                        {a.device_name && (
+                          <span className="text-xs text-muted-foreground truncate max-w-[150px]">
+                            {a.device_name}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0"
+                      onClick={() => copyCode(a.activation_code.toUpperCase())}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </AnimatedSection>
+
+      {/* Main install card */}
+      <AnimatedSection delay={0.15}>
         <Card>
           <CardContent className="p-6 sm:p-8">
             <div className="flex flex-col sm:flex-row items-center gap-6">
@@ -121,15 +226,14 @@ export default function ApkDownload() {
               <div className="flex-1 text-center sm:text-left">
                 <h2 className="text-xl font-bold">ClearHuma Mobil</h2>
                 <p className="text-muted-foreground text-sm mt-1">
-                  Telefonunuza kurun, gerçek bir uygulama gibi çalışsın.
+                  Telefonunuza kurun, aktivasyon koduyla hesabınıza bağlayın.
                 </p>
                 <div className="flex flex-wrap items-center gap-2 mt-3 justify-center sm:justify-start">
                   <Badge variant="outline" className="text-xs">v1.0.0</Badge>
                   <Badge variant="outline" className="text-xs">Android & iOS</Badge>
-                  <Badge variant="outline" className="text-xs">Anında Kurulum</Badge>
+                  <Badge variant="outline" className="text-xs">Kişiye Özel</Badge>
                 </div>
               </div>
-
               {isInstalled ? (
                 <div className="flex items-center gap-2 text-success shrink-0">
                   <CheckCircle2 className="h-5 w-5" />
@@ -143,7 +247,6 @@ export default function ApkDownload() {
                     if (deferredPrompt) {
                       installMutation.mutate();
                     } else {
-                      // Scroll to install steps
                       document.getElementById("install-steps")?.scrollIntoView({ behavior: "smooth" });
                       toast({
                         title: "Kurulum Rehberi",
@@ -168,49 +271,51 @@ export default function ApkDownload() {
         </Card>
       </AnimatedSection>
 
-      {/* Token info */}
-      {downloadToken && (
-        <AnimatedSection delay={0.15}>
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-base">Kişisel Kurulum Bilgileri</CardTitle>
-              <CardDescription>Bu token size özeldir, verileriniz başkalarıyla paylaşılmaz</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <Shield className="h-5 w-5 text-primary shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs text-muted-foreground">Kişisel Token</p>
-                  <p className="text-sm font-mono truncate">{downloadToken}</p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Toplam kurulum: <span className="font-medium">{myDownloads?.length ?? 0}</span>
-              </p>
-            </CardContent>
-          </Card>
-        </AnimatedSection>
-      )}
+      {/* How it works */}
+      <AnimatedSection delay={0.2}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Nasıl Çalışır?</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ol className="space-y-3">
+              {[
+                "Yukarıdan 'Yeni Kod' butonuyla kişisel aktivasyon kodunuzu oluşturun.",
+                "Aşağıdaki adımlarla uygulamayı telefonunuza kurun veya APK'yı indirin.",
+                "Uygulamayı açın — aktivasyon kodu giriş ekranı karşınıza çıkacak.",
+                "Kodunuzu girin — cihazınız otomatik olarak hesabınıza bağlanacak.",
+                "Her cihaz için ayrı kod gerekir — böylece herkes kendi hesabını kullanır.",
+              ].map((step, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-muted-foreground">{step}</span>
+                </li>
+              ))}
+            </ol>
+          </CardContent>
+        </Card>
+      </AnimatedSection>
 
       {/* Features */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-3">
-        <AnimatedSection delay={0.2}>
+        <AnimatedSection delay={0.25}>
           <Card className="h-full">
             <CardContent className="p-5 flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
                 <Shield className="h-5 w-5 text-success" />
               </div>
               <div>
-                <p className="font-medium text-sm">Güvenli & Gizli</p>
+                <p className="font-medium text-sm">Kişiye Özel</p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Verileriniz sadece size aittir, diğer kullanıcılar göremez.
+                  Her kullanıcı kendi aktivasyon koduyla bağlanır.
                 </p>
               </div>
             </CardContent>
           </Card>
         </AnimatedSection>
-
-        <AnimatedSection delay={0.25}>
+        <AnimatedSection delay={0.3}>
           <Card className="h-full">
             <CardContent className="p-5 flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -225,8 +330,7 @@ export default function ApkDownload() {
             </CardContent>
           </Card>
         </AnimatedSection>
-
-        <AnimatedSection delay={0.3}>
+        <AnimatedSection delay={0.35}>
           <Card className="h-full">
             <CardContent className="p-5 flex items-start gap-3">
               <div className="h-9 w-9 rounded-lg bg-info/10 flex items-center justify-center shrink-0">
@@ -244,7 +348,7 @@ export default function ApkDownload() {
       </div>
 
       {/* Install steps */}
-      <AnimatedSection delay={0.35}>
+      <AnimatedSection delay={0.4}>
         <Card id="install-steps">
           <CardHeader>
             <CardTitle className="text-base">Kurulum Adımları</CardTitle>
@@ -254,41 +358,29 @@ export default function ApkDownload() {
           </CardHeader>
           <CardContent>
             <ol className="space-y-3">
-              {isIOS ? (
-                <>
-                  {[
+              {(isIOS
+                ? [
                     "Safari tarayıcısında bu sayfayı açın.",
                     "Alt kısımdaki Paylaş (Share) butonuna dokunun.",
-                    "\"Ana Ekrana Ekle\" (Add to Home Screen) seçeneğini seçin.",
-                    "\"Ekle\" butonuna dokunun — uygulama ana ekranınıza eklenecek.",
-                    "Ana ekrandan ClearHuma ikonuna dokunarak açın ve giriş yapın.",
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm text-muted-foreground">{step}</span>
-                    </li>
-                  ))}
-                </>
-              ) : (
-                <>
-                  {[
+                    "\"Ana Ekrana Ekle\" seçeneğini seçin.",
+                    "\"Ekle\" butonuna dokunun.",
+                    "Ana ekrandan ClearHuma ikonuna dokunarak açın ve aktivasyon kodunuzu girin.",
+                  ]
+                : [
                     "Chrome tarayıcısında bu sayfayı açın.",
                     "Sağ üstteki üç nokta menüsüne (⋮) dokunun.",
-                    "\"Uygulamayı yükle\" veya \"Ana ekrana ekle\" seçeneğine dokunun.",
-                    "Açılan pencerede \"Yükle\" butonuna dokunun — uygulama ana ekranınıza eklenecek.",
-                    "Ana ekrandan ClearHuma ikonuna dokunarak açın ve giriş yapın.",
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3">
-                      <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
-                        {i + 1}
-                      </span>
-                      <span className="text-sm text-muted-foreground">{step}</span>
-                    </li>
-                  ))}
-                </>
-              )}
+                    "\"Uygulamayı yükle\" seçeneğine dokunun.",
+                    "\"Yükle\" butonuna dokunun.",
+                    "Ana ekrandan ClearHuma ikonuna dokunarak açın ve aktivasyon kodunuzu girin.",
+                  ]
+              ).map((step, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <span className="h-6 w-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm text-muted-foreground">{step}</span>
+                </li>
+              ))}
             </ol>
           </CardContent>
         </Card>

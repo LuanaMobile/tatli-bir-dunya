@@ -59,14 +59,27 @@ jobs:
           <html>
           <head>
             <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <meta http-equiv="refresh" content="0;url=PLACEHOLDER_URL">
-            <title>App</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+            <title>ClearHuma</title>
+            <style>body{margin:0;display:flex;align-items:center;justify-content:center;height:100vh;background:#0a0a0a;color:#fff;font-family:system-ui}</style>
           </head>
-          <body></body>
+          <body><p>Yükleniyor...</p></body>
           </html>
           HTMLEOF
-          sed -i "s|PLACEHOLDER_URL|${{ inputs.server_url }}|g" www/index.html
+          
+          # Configure Capacitor to use server URL (loads remote app with activation screen)
+          cat > capacitor.config.json << CAPEOF
+          {
+            "appId": "com.clearhuma.app",
+            "appName": "${{ inputs.app_name }}",
+            "webDir": "www",
+            "server": {
+              "url": "${{ inputs.server_url }}/activate",
+              "cleartext": true
+            }
+          }
+          CAPEOF
+          
           npx cap add android
 
       - name: Configure Android App
@@ -74,6 +87,18 @@ jobs:
           cd /tmp/apk-build
           sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">${{ inputs.app_name }}</string>|g" android/app/src/main/res/values/strings.xml
           sed -i "s|versionName \"1.0\"|versionName \"${{ inputs.version }}\"|g" android/app/build.gradle
+          
+          # Add Android permissions
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          sed -i '/<\/manifest>/i \
+            <uses-permission android:name="android.permission.INTERNET" \/>\
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" \/>\
+            <uses-permission android:name="android.permission.CAMERA" \/>\
+            <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" \/>\
+            <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" \/>\
+            <uses-permission android:name="android.permission.POST_NOTIFICATIONS" \/>\
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" \/>\
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" \/>' "$MANIFEST"
 
       - name: Download custom icon
         if: ${{ inputs.icon_url != '' }}

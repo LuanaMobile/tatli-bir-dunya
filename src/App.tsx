@@ -23,6 +23,7 @@ import Terms from "./pages/Terms";
 import ApkDownload from "./pages/ApkDownload";
 import ApkManagement from "./pages/ApkManagement";
 import ApkBuildConfig from "./pages/ApkBuildConfig";
+import ActivateDevice from "./pages/ActivateDevice";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/activate" element={<ActivateDevice />} />
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/users" element={<Users />} />

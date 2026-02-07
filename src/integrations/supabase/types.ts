@@ -217,6 +217,42 @@ export type Database = {
         }
         Relationships: []
       }
+      device_activations: {
+        Row: {
+          activated_at: string | null
+          activation_code: string
+          created_at: string
+          device_info: Json | null
+          device_name: string | null
+          expires_at: string
+          id: string
+          is_activated: boolean
+          user_id: string
+        }
+        Insert: {
+          activated_at?: string | null
+          activation_code?: string
+          created_at?: string
+          device_info?: Json | null
+          device_name?: string | null
+          expires_at?: string
+          id?: string
+          is_activated?: boolean
+          user_id: string
+        }
+        Update: {
+          activated_at?: string | null
+          activation_code?: string
+          created_at?: string
+          device_info?: Json | null
+          device_name?: string | null
+          expires_at?: string
+          id?: string
+          is_activated?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       devices: {
         Row: {
           assigned_user_id: string | null
