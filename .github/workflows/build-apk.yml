@@ -59,7 +59,7 @@ jobs:
             <meta charset="UTF-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
             <meta http-equiv="refresh" content="0;url=PLACEHOLDER_URL">
-            <title>${{ inputs.app_name }}</title>
+            <title>App</title>
           </head>
           <body></body>
           </html>
@@ -70,16 +70,13 @@ jobs:
       - name: Configure Android App
         run: |
           cd /tmp/apk-build
-          # Update app name in strings.xml
           sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">${{ inputs.app_name }}</string>|g" android/app/src/main/res/values/strings.xml
-          # Update version
           sed -i "s|versionName \"1.0\"|versionName \"${{ inputs.version }}\"|g" android/app/build.gradle
 
       - name: Download custom icon
         if: ${{ inputs.icon_url != '' }}
         run: |
           cd /tmp/apk-build
-          # Download and set icon for all densities
           curl -L -o icon.png "${{ inputs.icon_url }}"
           for dir in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
             mkdir -p "android/app/src/main/res/mipmap-${dir}"
@@ -93,26 +90,18 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK to Supabase Storage
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+      - name: Upload APK via Edge Function
         run: |
           APK_PATH=$(find /tmp/apk-build/android/app/build/outputs/apk/debug -name "*.apk" | head -1)
           APK_NAME="${{ inputs.app_name }}-${{ inputs.version }}.apk"
-
-          # Upload to Supabase Storage
-          curl -X POST "${SUPABASE_URL}/storage/v1/object/apk-files/${APK_NAME}" \
-            -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}" \
-            -H "Content-Type: application/vnd.android.package-archive" \
+          UPLOAD_URL="${{ inputs.callback_url }}"
+          
+          # Replace callback function path with upload function path
+          BASE_URL=$(echo "$UPLOAD_URL" | sed 's|/functions/v1/.*|/functions/v1/upload-apk|')
+          
+          curl -X POST "${BASE_URL}?filename=${APK_NAME}&config_id=${{ inputs.config_id }}&secret=${{ secrets.CALLBACK_SECRET }}" \
+            -H "Content-Type: application/octet-stream" \
             --data-binary @"${APK_PATH}"
-
-          APK_URL="${SUPABASE_URL}/storage/v1/object/public/apk-files/${APK_NAME}"
-
-          # Callback to notify build complete
-          curl -X POST "${{ inputs.callback_url }}" \
-            -H "Content-Type: application/json" \
-            -d "{\"config_id\":\"${{ inputs.config_id }}\",\"status\":\"success\",\"apk_url\":\"${APK_URL}\",\"secret\":\"${{ secrets.CALLBACK_SECRET }}\"}"
 
       - name: Notify failure
         if: failure()
