@@ -26,7 +26,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 const mainNav = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Kullanıcılar", url: "/users", icon: Users },
   { title: "Cihazlar", url: "/devices", icon: Smartphone },
   { title: "İzin Yönetimi", url: "/consents", icon: ShieldCheck },
