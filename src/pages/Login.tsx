@@ -152,6 +152,23 @@ export default function Login() {
           </Tabs>
         </Card>
 
+        <div className="flex gap-2 mt-4">
+          <Button
+            variant="outline"
+            className="flex-1 text-xs"
+            onClick={() => { setLoginEmail("admin@clearhuma.com"); setLoginPassword("Admin123!"); }}
+          >
+            Admin Test
+          </Button>
+          <Button
+            variant="outline"
+            className="flex-1 text-xs"
+            onClick={() => { setLoginEmail("user@clearhuma.com"); setLoginPassword("User123!"); }}
+          >
+            User Test
+          </Button>
+        </div>
+
         <p className="text-xs text-muted-foreground text-center mt-4">
           Giriş yaparak{" "}
           <a href="/privacy-policy" className="text-primary hover:underline">Gizlilik Politikası</a> ve{" "}
