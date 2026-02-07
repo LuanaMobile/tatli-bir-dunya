@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,9 @@ export default function Login() {
   const [regPassword, setRegPassword] = useState("");
   const [regPasswordConfirm, setRegPasswordConfirm] = useState("");
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const redirectTo = searchParams.get("redirect") || "/dashboard";
 
   const doLogin = async (email: string, password: string) => {
     setLoading(true);
@@ -29,8 +31,8 @@ export default function Login() {
       if (error) {
         toast({ title: "Giriş başarısız", description: error.message, variant: "destructive" });
       } else {
-        toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
-        navigate("/dashboard");
+        toast({ title: "Giriş başarılı", description: "Yönlendiriliyorsunuz..." });
+        navigate(redirectTo);
       }
     } catch (err) {
       console.error("Login error:", err);
