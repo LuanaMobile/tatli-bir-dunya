@@ -1,10 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Plus, MoreHorizontal, Shield, User, UserCog } from "lucide-react";
+import { Search, Shield, User, UserCog, MoreHorizontal } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { AddUserDialog } from "@/components/dialogs/AddUserDialog";
 
 const mockUsers = [
   { id: 1, name: "Ahmet Yılmaz", email: "ahmet@example.com", role: "guardian", devices: 3, status: "active", plan: "Premium", lastActive: "2 dk önce" },
@@ -30,6 +32,7 @@ const statusColors: Record<string, string> = {
 
 export default function Users() {
   const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
   const filtered = mockUsers.filter(
     (u) => u.name.toLowerCase().includes(search.toLowerCase()) || u.email.toLowerCase().includes(search.toLowerCase())
@@ -42,10 +45,7 @@ export default function Users() {
           <h1 className="text-2xl font-bold tracking-tight">Kullanıcılar</h1>
           <p className="text-muted-foreground">Tüm kullanıcıları yönetin</p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Kullanıcı Ekle
-        </Button>
+        <AddUserDialog />
       </div>
 
       <Card>
@@ -74,7 +74,7 @@ export default function Users() {
               {filtered.map((user) => {
                 const role = roleLabels[user.role] || roleLabels.user;
                 return (
-                  <TableRow key={user.id}>
+                  <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}`)}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
@@ -103,7 +103,7 @@ export default function Users() {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">{user.lastActive}</TableCell>
                     <TableCell>
-                      <Button variant="ghost" size="icon" className="h-8 w-8">
+                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </TableCell>

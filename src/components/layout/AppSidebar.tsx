@@ -9,6 +9,7 @@ import {
   Settings,
   Eye,
   LogOut,
+  Receipt,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import {
@@ -22,6 +23,7 @@ import {
   SidebarMenuItem,
   SidebarFooter,
 } from "@/components/ui/sidebar";
+import { useNavigate } from "react-router-dom";
 
 const mainNav = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -33,11 +35,14 @@ const mainNav = [
 
 const managementNav = [
   { title: "Abonelikler", url: "/subscriptions", icon: CreditCard },
+  { title: "Faturalar", url: "/invoices", icon: Receipt },
   { title: "Raporlar", url: "/reports", icon: BarChart3 },
   { title: "Ayarlar", url: "/settings", icon: Settings },
 ];
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+
   return (
     <Sidebar collapsible="icon">
       <div className="flex items-center gap-2 px-4 py-5 border-b border-sidebar-border">
@@ -90,7 +95,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Çıkış Yap">
+            <SidebarMenuButton tooltip="Çıkış Yap" onClick={() => navigate("/login")}>
               <LogOut className="h-4 w-4" />
               <span>Çıkış Yap</span>
             </SidebarMenuButton>

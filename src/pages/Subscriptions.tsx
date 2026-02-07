@@ -1,9 +1,10 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Plus, CreditCard, Users, Smartphone, Clock, MoreHorizontal } from "lucide-react";
+import { Users, Smartphone, Clock, MoreHorizontal } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { AddPlanDialog } from "@/components/dialogs/AddPlanDialog";
 
 const plans = [
   { id: 1, name: "Free", price: "₺0", period: "aylık", users: 1, devices: 1, storage: "7 gün", features: ["Temel ekran süresi", "Uygulama listesi"], active: 45 },
@@ -36,10 +37,7 @@ export default function Subscriptions() {
           <h1 className="text-2xl font-bold tracking-tight">Abonelikler</h1>
           <p className="text-muted-foreground">Plan ve abonelik yönetimi</p>
         </div>
-        <Button>
-          <Plus className="h-4 w-4 mr-2" />
-          Plan Oluştur
-        </Button>
+        <AddPlanDialog />
       </div>
 
       <Tabs defaultValue="plans">
