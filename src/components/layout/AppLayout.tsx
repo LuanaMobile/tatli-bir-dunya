@@ -11,16 +11,18 @@ export function AppLayout() {
     : "??";
   const roleName = role === "super_admin" ? "Super Admin" : role === "guardian" ? "Guardian" : "Kullanıcı";
 
+  const themeClass = role === "super_admin" || role === "guardian" ? "dark" : "dark theme-user";
+
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full dark">
+      <div className={`min-h-screen flex w-full ${themeClass}`}>
         <AppSidebar />
         <div className="flex-1 flex flex-col min-h-screen">
           <header className="h-14 flex items-center justify-between border-b border-border px-4 bg-card">
             <div className="flex items-center gap-2">
               <SidebarTrigger />
               <span className="text-sm text-muted-foreground hidden sm:inline">
-                Dijital Aktivite Analizi ve Cihaz Yönetim Platformu
+                {role === "super_admin" ? "Yönetim Paneli" : role === "guardian" ? "Guardian Paneli" : "Kullanıcı Paneli"}
               </span>
             </div>
             <div className="flex items-center gap-3">
