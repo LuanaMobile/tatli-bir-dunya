@@ -22,13 +22,9 @@ export default function Login() {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const doLogin = async (email: string, password: string) => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginEmail,
-      password: loginPassword,
-    });
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
       toast({ title: "Giriş başarısız", description: error.message, variant: "destructive" });
@@ -36,6 +32,11 @@ export default function Login() {
       toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
       navigate("/dashboard");
     }
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await doLogin(loginEmail, loginPassword);
   };
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -156,14 +157,16 @@ export default function Login() {
           <Button
             variant="outline"
             className="flex-1 text-xs"
-            onClick={() => { setLoginEmail("admin@clearhuma.com"); setLoginPassword("Admin123!"); }}
+            disabled={loading}
+            onClick={() => doLogin("admin@clearhuma.com", "Admin123!")}
           >
             Admin Test
           </Button>
           <Button
             variant="outline"
             className="flex-1 text-xs"
-            onClick={() => { setLoginEmail("user@clearhuma.com"); setLoginPassword("User123!"); }}
+            disabled={loading}
+            onClick={() => doLogin("user@clearhuma.com", "User123!")}
           >
             User Test
           </Button>
