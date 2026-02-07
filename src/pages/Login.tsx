@@ -1,37 +1,64 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [regFirstName, setRegFirstName] = useState("");
+  const [regLastName, setRegLastName] = useState("");
+  const [regEmail, setRegEmail] = useState("");
+  const [regPassword, setRegPassword] = useState("");
+  const [regPasswordConfirm, setRegPasswordConfirm] = useState("");
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const { error } = await supabase.auth.signInWithPassword({
+      email: loginEmail,
+      password: loginPassword,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Giriş başarısız", description: error.message, variant: "destructive" });
+    } else {
       toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
       navigate("/dashboard");
-    }, 1000);
+    }
   };
 
-  const handleRegister = (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (regPassword !== regPasswordConfirm) {
+      toast({ title: "Hata", description: "Şifreler eşleşmiyor.", variant: "destructive" });
+      return;
+    }
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      toast({ title: "Kayıt başarılı", description: "Hesabınız oluşturuldu." });
-      navigate("/dashboard");
-    }, 1000);
+    const { error } = await supabase.auth.signUp({
+      email: regEmail,
+      password: regPassword,
+      options: {
+        data: { full_name: `${regFirstName} ${regLastName}` },
+        emailRedirectTo: window.location.origin,
+      },
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: "Kayıt başarısız", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Kayıt başarılı", description: "Email adresinizi doğrulayın ve giriş yapın." });
+    }
   };
 
   return (
@@ -62,7 +89,7 @@ export default function Login() {
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" placeholder="admin@clearhuma.com" required />
+                    <Input id="login-email" type="email" placeholder="admin@clearhuma.com" required value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Şifre</Label>
@@ -72,6 +99,8 @@ export default function Login() {
                         type={showPassword ? "text" : "password"}
                         placeholder="••••••••"
                         required
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
                       />
                       <Button
                         type="button"
@@ -84,15 +113,6 @@ export default function Login() {
                       </Button>
                     </div>
                   </div>
-                  <div className="flex items-center justify-between">
-                    <label className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" className="rounded border-border" />
-                      Beni hatırla
-                    </label>
-                    <Button variant="link" className="text-xs p-0 h-auto text-primary">
-                      Şifremi unuttum
-                    </Button>
-                  </div>
                   <Button className="w-full" disabled={loading}>
                     {loading ? "Giriş yapılıyor..." : "Giriş Yap"}
                   </Button>
@@ -104,24 +124,24 @@ export default function Login() {
                   <div className="grid gap-4 grid-cols-2">
                     <div className="space-y-2">
                       <Label>Ad</Label>
-                      <Input placeholder="Ad" required />
+                      <Input placeholder="Ad" required value={regFirstName} onChange={(e) => setRegFirstName(e.target.value)} />
                     </div>
                     <div className="space-y-2">
                       <Label>Soyad</Label>
-                      <Input placeholder="Soyad" required />
+                      <Input placeholder="Soyad" required value={regLastName} onChange={(e) => setRegLastName(e.target.value)} />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <Label>Email</Label>
-                    <Input type="email" placeholder="email@example.com" required />
+                    <Input type="email" placeholder="email@example.com" required value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label>Şifre</Label>
-                    <Input type="password" placeholder="••••••••" required />
+                    <Input type="password" placeholder="••••••••" required value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
                   </div>
                   <div className="space-y-2">
                     <Label>Şifre Tekrar</Label>
-                    <Input type="password" placeholder="••••••••" required />
+                    <Input type="password" placeholder="••••••••" required value={regPasswordConfirm} onChange={(e) => setRegPasswordConfirm(e.target.value)} />
                   </div>
                   <Button className="w-full" disabled={loading}>
                     {loading ? "Kayıt yapılıyor..." : "Kayıt Ol"}

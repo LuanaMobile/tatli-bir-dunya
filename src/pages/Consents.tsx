@@ -1,31 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ShieldCheck, ShieldX, Eye, Clock } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { ShieldCheck, ShieldX, Clock } from "lucide-react";
 import { ResponsiveTable } from "@/components/ResponsiveTable";
 import { AnimatedSection, StaggerContainer, StaggerItem } from "@/components/AnimatedSection";
-
-const mockConsents = [
-  { id: 1, user: "Ahmet Yılmaz", module: "SMS Okuma", status: "granted", grantedAt: "2025-01-15 14:32", ip: "192.168.1.45", device: "Samsung Galaxy S23" },
-  { id: 2, user: "Ahmet Yılmaz", module: "Arama Kayıtları", status: "granted", grantedAt: "2025-01-15 14:32", ip: "192.168.1.45", device: "Samsung Galaxy S23" },
-  { id: 3, user: "Elif Kaya", module: "Ekran Süresi", status: "granted", grantedAt: "2025-01-20 09:15", ip: "10.0.0.12", device: "Xiaomi Redmi Note 12" },
-  { id: 4, user: "Zeynep Toprak", module: "Konum Takibi", status: "revoked", grantedAt: "2025-01-10 11:00", ip: "172.16.0.5", device: "Oppo Reno 8" },
-  { id: 5, user: "Can Bulut", module: "Keylogger", status: "granted", grantedAt: "2025-01-22 16:45", ip: "192.168.0.88", device: "Samsung Galaxy A54" },
-  { id: 6, user: "Mehmet Arslan", module: "Uygulama Listesi", status: "granted", grantedAt: "2025-01-18 08:20", ip: "10.10.10.1", device: "Google Pixel 7" },
-  { id: 7, user: "Ayşe Demir", module: "Sosyal Medya Mesajları", status: "expired", grantedAt: "2024-12-01 10:00", ip: "192.168.2.77", device: "Huawei P50" },
-];
+import { useConsents } from "@/hooks/useData";
 
 const statusConfig: Record<string, { label: string; className: string; icon: typeof ShieldCheck }> = {
-  granted: { label: "Verildi", className: "bg-success/10 text-success border-success/20", icon: ShieldCheck },
-  revoked: { label: "İptal Edildi", className: "bg-destructive/10 text-destructive border-destructive/20", icon: ShieldX },
-  expired: { label: "Süresi Doldu", className: "bg-warning/10 text-warning border-warning/20", icon: Clock },
+  true: { label: "Verildi", className: "bg-success/10 text-success border-success/20", icon: ShieldCheck },
+  false: { label: "İptal Edildi", className: "bg-destructive/10 text-destructive border-destructive/20", icon: ShieldX },
 };
 
 export default function Consents() {
-  const granted = mockConsents.filter(c => c.status === "granted").length;
-  const revoked = mockConsents.filter(c => c.status === "revoked").length;
-  const expired = mockConsents.filter(c => c.status === "expired").length;
+  const { data: consents, isLoading } = useConsents();
+  const allConsents = consents ?? [];
+  const granted = allConsents.filter(c => c.granted).length;
+  const revoked = allConsents.filter(c => !c.granted).length;
 
   return (
     <div className="space-y-6">
@@ -66,12 +56,12 @@ export default function Consents() {
         <StaggerItem>
           <Card>
             <CardContent className="p-5 flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-warning/10 flex items-center justify-center">
-                <Clock className="h-5 w-5 text-warning" />
+              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                <Clock className="h-5 w-5 text-primary" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{expired}</p>
-                <p className="text-sm text-muted-foreground">Süresi Dolan</p>
+                <p className="text-2xl font-bold">{allConsents.length}</p>
+                <p className="text-sm text-muted-foreground">Toplam Kayıt</p>
               </div>
             </CardContent>
           </Card>
@@ -84,46 +74,52 @@ export default function Consents() {
             <CardTitle className="text-base">İzin Kayıtları</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ResponsiveTable>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Kullanıcı</TableHead>
-                    <TableHead>Modül</TableHead>
-                    <TableHead className="hidden md:table-cell">Cihaz</TableHead>
-                    <TableHead>Durum</TableHead>
-                    <TableHead className="hidden lg:table-cell">IP Adresi</TableHead>
-                    <TableHead className="hidden sm:table-cell">Tarih</TableHead>
-                    <TableHead className="w-10"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {mockConsents.map((consent) => {
-                    const config = statusConfig[consent.status];
-                    return (
-                      <TableRow key={consent.id}>
-                        <TableCell className="font-medium text-sm">{consent.user}</TableCell>
-                        <TableCell className="text-sm">{consent.module}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground hidden md:table-cell">{consent.device}</TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={`text-xs ${config.className}`}>
-                            <config.icon className="h-3 w-3 mr-1" />
-                            {config.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-sm text-muted-foreground font-mono hidden lg:table-cell">{consent.ip}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">{consent.grantedAt}</TableCell>
-                        <TableCell>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <Eye className="h-4 w-4" />
-                          </Button>
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
+              </div>
+            ) : (
+              <ResponsiveTable>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>İzin Tipi</TableHead>
+                      <TableHead>Durum</TableHead>
+                      <TableHead className="hidden lg:table-cell">IP Adresi</TableHead>
+                      <TableHead className="hidden sm:table-cell">Tarih</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {allConsents.length === 0 ? (
+                      <TableRow>
+                        <TableCell colSpan={4} className="text-center py-8 text-muted-foreground">
+                          Henüz izin kaydı bulunmuyor
                         </TableCell>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </ResponsiveTable>
+                    ) : (
+                      allConsents.map((consent) => {
+                        const config = statusConfig[String(consent.granted)];
+                        return (
+                          <TableRow key={consent.id}>
+                            <TableCell className="font-medium text-sm">{consent.consent_type}</TableCell>
+                            <TableCell>
+                              <Badge variant="outline" className={`text-xs ${config.className}`}>
+                                <config.icon className="h-3 w-3 mr-1" />
+                                {config.label}
+                              </Badge>
+                            </TableCell>
+                            <TableCell className="text-sm text-muted-foreground font-mono hidden lg:table-cell">{consent.ip_address ?? "—"}</TableCell>
+                            <TableCell className="text-sm text-muted-foreground hidden sm:table-cell">
+                              {new Date(consent.created_at).toLocaleString("tr-TR")}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })
+                    )}
+                  </TableBody>
+                </Table>
+              </ResponsiveTable>
+            )}
           </CardContent>
         </Card>
       </AnimatedSection>

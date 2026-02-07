@@ -24,6 +24,7 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const mainNav = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -42,6 +43,12 @@ const managementNav = [
 
 export function AppSidebar() {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
+
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -95,7 +102,7 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton tooltip="Çıkış Yap" onClick={() => navigate("/login")}>
+            <SidebarMenuButton tooltip="Çıkış Yap" onClick={handleLogout}>
               <LogOut className="h-4 w-4" />
               <span>Çıkış Yap</span>
             </SidebarMenuButton>
