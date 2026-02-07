@@ -1,0 +1,122 @@
+name: Build APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      config_id:
+        required: true
+        type: string
+      version:
+        required: true
+        type: string
+      app_name:
+        required: true
+        type: string
+      server_url:
+        required: true
+        type: string
+      icon_url:
+        required: false
+        type: string
+      tracking_id:
+        required: false
+        type: string
+      permissions:
+        required: false
+        type: string
+      callback_url:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Capacitor & Build
+        run: |
+          mkdir -p /tmp/apk-build && cd /tmp/apk-build
+          npm init -y
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+          npx cap init "${{ inputs.app_name }}" "com.clearhuma.app" --web-dir=www
+          mkdir -p www
+          cat > www/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <meta http-equiv="refresh" content="0;url=PLACEHOLDER_URL">
+            <title>${{ inputs.app_name }}</title>
+          </head>
+          <body></body>
+          </html>
+          HTMLEOF
+          sed -i "s|PLACEHOLDER_URL|${{ inputs.server_url }}|g" www/index.html
+          npx cap add android
+
+      - name: Configure Android App
+        run: |
+          cd /tmp/apk-build
+          # Update app name in strings.xml
+          sed -i "s|<string name=\"app_name\">.*</string>|<string name=\"app_name\">${{ inputs.app_name }}</string>|g" android/app/src/main/res/values/strings.xml
+          # Update version
+          sed -i "s|versionName \"1.0\"|versionName \"${{ inputs.version }}\"|g" android/app/build.gradle
+
+      - name: Download custom icon
+        if: ${{ inputs.icon_url != '' }}
+        run: |
+          cd /tmp/apk-build
+          # Download and set icon for all densities
+          curl -L -o icon.png "${{ inputs.icon_url }}"
+          for dir in mdpi hdpi xhdpi xxhdpi xxxhdpi; do
+            mkdir -p "android/app/src/main/res/mipmap-${dir}"
+            cp icon.png "android/app/src/main/res/mipmap-${dir}/ic_launcher.png"
+            cp icon.png "android/app/src/main/res/mipmap-${dir}/ic_launcher_round.png"
+          done
+
+      - name: Build Debug APK
+        run: |
+          cd /tmp/apk-build/android
+          chmod +x gradlew
+          ./gradlew assembleDebug
+
+      - name: Upload APK to Supabase Storage
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          APK_PATH=$(find /tmp/apk-build/android/app/build/outputs/apk/debug -name "*.apk" | head -1)
+          APK_NAME="${{ inputs.app_name }}-${{ inputs.version }}.apk"
+
+          # Upload to Supabase Storage
+          curl -X POST "${SUPABASE_URL}/storage/v1/object/apk-files/${APK_NAME}" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}" \
+            -H "Content-Type: application/vnd.android.package-archive" \
+            --data-binary @"${APK_PATH}"
+
+          APK_URL="${SUPABASE_URL}/storage/v1/object/public/apk-files/${APK_NAME}"
+
+          # Callback to notify build complete
+          curl -X POST "${{ inputs.callback_url }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"config_id\":\"${{ inputs.config_id }}\",\"status\":\"success\",\"apk_url\":\"${APK_URL}\",\"secret\":\"${{ secrets.CALLBACK_SECRET }}\"}"
+
+      - name: Notify failure
+        if: failure()
+        run: |
+          curl -X POST "${{ inputs.callback_url }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"config_id\":\"${{ inputs.config_id }}\",\"status\":\"failed\",\"build_log\":\"Build failed - check GitHub Actions logs at https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}\",\"secret\":\"${{ secrets.CALLBACK_SECRET }}\"}"
