@@ -24,13 +24,19 @@ export default function Login() {
 
   const doLogin = async (email: string, password: string) => {
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) {
-      toast({ title: "Giriş başarısız", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
-      navigate("/dashboard");
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast({ title: "Giriş başarısız", description: error.message, variant: "destructive" });
+      } else {
+        toast({ title: "Giriş başarılı", description: "Yönetim paneline yönlendiriliyorsunuz..." });
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      console.error("Login error:", err);
+      toast({ title: "Bağlantı hatası", description: "Lütfen tekrar deneyin.", variant: "destructive" });
+    } finally {
+      setLoading(false);
     }
   };
 
