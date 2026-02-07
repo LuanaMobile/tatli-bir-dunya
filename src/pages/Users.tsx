@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AddUserDialog } from "@/components/dialogs/AddUserDialog";
+import { ResponsiveTable } from "@/components/ResponsiveTable";
+import { AnimatedSection } from "@/components/AnimatedSection";
 
 const mockUsers = [
   { id: 1, name: "Ahmet Yılmaz", email: "ahmet@example.com", role: "guardian", devices: 3, status: "active", plan: "Premium", lastActive: "2 dk önce" },
@@ -40,80 +42,86 @@ export default function Users() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Kullanıcılar</h1>
-          <p className="text-muted-foreground">Tüm kullanıcıları yönetin</p>
-        </div>
-        <AddUserDialog />
-      </div>
-
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="İsim veya email ara..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
-            </div>
+      <AnimatedSection>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Kullanıcılar</h1>
+            <p className="text-muted-foreground">Tüm kullanıcıları yönetin</p>
           </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Kullanıcı</TableHead>
-                <TableHead>Rol</TableHead>
-                <TableHead>Cihaz</TableHead>
-                <TableHead>Plan</TableHead>
-                <TableHead>Durum</TableHead>
-                <TableHead>Son Aktif</TableHead>
-                <TableHead className="w-10"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filtered.map((user) => {
-                const role = roleLabels[user.role] || roleLabels.user;
-                return (
-                  <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}`)}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
-                          {user.name.split(" ").map((n) => n[0]).join("")}
-                        </div>
-                        <div>
-                          <p className="font-medium text-sm">{user.name}</p>
-                          <p className="text-xs text-muted-foreground">{user.email}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1 text-sm">
-                        <role.icon className="h-3 w-3" />
-                        {role.label}
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-sm">{user.devices}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="text-xs">{user.plan}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`text-xs ${statusColors[user.status]}`}>
-                        {user.status === "active" ? "Aktif" : user.status === "inactive" ? "Pasif" : "Askıda"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-sm text-muted-foreground">{user.lastActive}</TableCell>
-                    <TableCell>
-                      <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
+          <AddUserDialog />
+        </div>
+      </AnimatedSection>
+
+      <AnimatedSection delay={0.1}>
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="İsim veya email ara..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <ResponsiveTable>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Kullanıcı</TableHead>
+                    <TableHead>Rol</TableHead>
+                    <TableHead>Cihaz</TableHead>
+                    <TableHead>Plan</TableHead>
+                    <TableHead>Durum</TableHead>
+                    <TableHead>Son Aktif</TableHead>
+                    <TableHead className="w-10"></TableHead>
                   </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+                </TableHeader>
+                <TableBody>
+                  {filtered.map((user) => {
+                    const role = roleLabels[user.role] || roleLabels.user;
+                    return (
+                      <TableRow key={user.id} className="cursor-pointer" onClick={() => navigate(`/users/${user.id}`)}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
+                              {user.name.split(" ").map((n) => n[0]).join("")}
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{user.name}</p>
+                              <p className="text-xs text-muted-foreground">{user.email}</p>
+                            </div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-1 text-sm">
+                            <role.icon className="h-3 w-3" />
+                            {role.label}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-sm">{user.devices}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="text-xs">{user.plan}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className={`text-xs ${statusColors[user.status]}`}>
+                            {user.status === "active" ? "Aktif" : user.status === "inactive" ? "Pasif" : "Askıda"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">{user.lastActive}</TableCell>
+                        <TableCell>
+                          <Button variant="ghost" size="icon" className="h-8 w-8" onClick={(e) => e.stopPropagation()}>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </ResponsiveTable>
+          </CardContent>
+        </Card>
+      </AnimatedSection>
     </div>
   );
 }
