@@ -20,6 +20,7 @@ import Settings from "./pages/Settings";
 import Login from "./pages/Login";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import Terms from "./pages/Terms";
+import ApkDownload from "./pages/ApkDownload";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
               <Route path="/invoices" element={<Invoices />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/apk-download" element={<ApkDownload />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<Terms />} />
             </Route>
